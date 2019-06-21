@@ -285,7 +285,8 @@ var cnItems = {
 }
 
 //需处理的前缀
-var cnPrefix = {}
+var cnPrefix = {
+}
 
 //需处理的后缀
 var cnPostfix = {
@@ -293,13 +294,13 @@ var cnPostfix = {
 }
 
 //需排除的，正则匹配
-var cnExcludeWhole = [
-    /^[x+\-]?\d+(\.\d+)?(e[+\-]?\d+)?(\%)?\s*$/, //12.34e+4
-    /^\s*$/, //纯空格
+var cnExcludeWhole= [
+    /^[x+\-]?\d+(\.\d+)?(e[+\-]?\d+)?(\%)?\s*$/,                                          //12.34e+4
+    /^\s*$/,                                                                //纯空格
 ];
 var cnExcludePostfix = [
-    /:?\s*x?\d+(\.\d+)?(e[+\-]?\d+)?\s*$/, //12.34e+4
-    /:?\s*x?\d+(\.\d+)?[A-Za-z]{0,2}$/, //: 12.34K, x1.5
+    /:?\s*x?\d+(\.\d+)?(e[+\-]?\d+)?\s*$/,                                          //12.34e+4
+    /:?\s*x?\d+(\.\d+)?[A-Za-z]{0,2}$/,  //: 12.34K, x1.5
 ]
 
 //2.采集新词
@@ -326,27 +327,27 @@ var cnItem = function () {
 
     //处理前缀
     let text_prefix = "";
-    for (let prefix in cnPrefix) {
-        if (text.substr(0, prefix.length) === prefix) {
+    for(let prefix in cnPrefix){
+        if (text.substr(0,prefix.length) === prefix){
             text_prefix = cnPrefix[prefix];
             text = text.substr(prefix.length);
         }
     }
     //处理后缀
     let text_postfix = "";
-    for (let postfix in cnPostfix) {
-        if (text.substr(-postfix.length) === postfix) {
+    for(let postfix in cnPostfix){
+        if (text.substr(-postfix.length) === postfix){
             text_postfix = cnPostfix[postfix];
-            text = text.substr(0, text.length - postfix.length);
+            text = text.substr(0,text.length-postfix.length);
         }
     }
     //处理正则后缀
     let text_reg_exclude_postfix = "";
-    for (let reg of cnExcludePostfix) {
+    for(let reg of cnExcludePostfix){
         let result = text.match(reg);
-        if (result) {
+        if (result){
             text_reg_exclude_postfix = result[0];
-            text = text.substr(0, text.length - text_reg_exclude_postfix.length);
+            text = text.substr(0, text.length-text_reg_exclude_postfix.length);
         }
     }
 
@@ -354,8 +355,8 @@ var cnItem = function () {
     if (!cnItems._OTHER_) cnItems._OTHER_ = [];
 
     //检查是否排除
-    for (let reg of cnExcludeWhole) {
-        if (reg.test(text)) {
+    for(let reg of cnExcludeWhole){
+        if (reg.test(text)){
             return text_prefix + text + text_reg_exclude_postfix + text_postfix;
         }
     }
@@ -372,7 +373,7 @@ var cnItem = function () {
 
     //调整收录的词条，0=收录原文，1=收录去除前后缀的文本
     let save_cfg = 1;
-    let save_text = save_cfg ? text : arguments[0]
+    let save_text = save_cfg?text:arguments[0]
     //遍历生词表是否收录
     for (
         let i = 0; i < cnItems._OTHER_.length; i++
@@ -382,7 +383,7 @@ var cnItem = function () {
             return arguments[0];
     }
 
-    if (cnItems._OTHER_.length < 500) {
+    if (cnItems._OTHER_.length < 500){
         //未收录则保存
         cnItems._OTHER_.push(save_text);
         cnItems._OTHER_.sort(
@@ -403,19 +404,20 @@ var cnItem = function () {
     return arguments[0];
 };
 
-document.createElement = function (name, opt) {
-    if (name == 'canvas') {
-        let canvasElement = document.__proto__.createElement.bind(this)(name, opt);
-        canvasElement.getContext('2d').fillText = function (text, x, y, max) {
-            return this.__proto__.fillText.bind(this)(cnItem(text), x, y, max);
-        }
-        canvasElement.getContext('2d').strokeText = function (text, x, y, max) {
-            return this.__proto__.strokeText.bind(this)(cnItem(text), x, y, max);
-        }
-        canvasElement.getContext('2d').measureText = function (text) {
-            return this.__proto__.measureText.bind(this)(cnItem(text));
-        }
-        return canvasElement;
-    } else
-        return document.__proto__.createElement.bind(this)(name, opt);
+document.createElement = function(name,opt){
+	if(name=='canvas'){
+		let canvasElement = document.__proto__.createElement.bind(this)(name,opt);
+		canvasElement.getContext('2d').fillText = function(text,x,y,max){
+			return this.__proto__.fillText.bind(this)(cnItem(text),x,y,max);
+		}
+		canvasElement.getContext('2d').strokeText = function(text,x,y,max){
+			return this.__proto__.strokeText.bind(this)(cnItem(text),x,y,max);
+		}
+		canvasElement.getContext('2d').measureText = function(text){
+			return this.__proto__.measureText.bind(this)(cnItem(text));
+		}
+		return canvasElement;
+	}
+	else
+		return document.__proto__.createElement.bind(this)(name,opt);
 }
