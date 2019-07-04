@@ -23,7 +23,6 @@ var cnItems = {
     '52 cards ': '52 纸牌 ',
     '5th dice multiplier': '5号骰子加成',
     '5th dice multiplier ': '5号骰子加成 ',
-    'a': '一个',
     'Achievements': '成就',
     'Active Playtime': '有效的游戏时间',
     'afford': '承受',
@@ -158,34 +157,34 @@ var cnItems = {
     'dice,': '骰子，',
     'roll': '掷骰子',
     'Roll': '掷骰子',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
-    '': '',
+    'Settings': '设置',
+    'all dice': '所有骰子',
+    'All dice multiplier': '所有骰子加成',
+    'animation': '动画',
+    'auto': '自动',
+    'achievements': '成就',
+    'Cards': '纸牌',
+    'cards': '纸牌',
+    'Upgrade': '升级',
+    'Level': '等级',
+    'Multi': '加成',
+    'seconds': '秒',
+    'Skill Points Multi': '技能点加成',
+    'You gained': '你获得了',
+    'Loading': '加载中',
+    'you': '你',
+    'your': '你的',
+    'Version:': '版本:',
+    'Version: 1.': '版本: 1.',
+    'WIN!': '赢了！',
+    'upgrade': '升级',
+    'upgrades': '升级',
+    'Upgrades': '升级',
+    'Statistics': '统计',
+    'Start': '开始',
+    'Next Card:': '下一张纸牌：',
+    'Next Auto Roll:': '下一次自动掷骰子：',
+    'Shop': '商店',
     '': '',
     '': '',
     '': '',
@@ -251,6 +250,7 @@ var cnItems = {
     '': '',
     '': '',
     //原路返回
+    'a': 'a',
     '0/': '0/',
     '1 x': '1 x',
     '1.': '1.',
@@ -290,7 +290,7 @@ var cnPrefix = {
 
 //需处理的后缀
 var cnPostfix = {
-
+    ' ':' '
 }
 
 //需排除的，正则匹配
@@ -302,6 +302,16 @@ var cnExcludePostfix = [
     /:?\s*x?\d+(\.\d+)?(e[+\-]?\d+)?\s*$/,                                          //12.34e+4
     /:?\s*x?\d+(\.\d+)?[A-Za-z]{0,2}$/,  //: 12.34K, x1.5
 ]
+
+//正则替换，带数字的固定格式句子
+var cnRegReplace = new Map([
+	[/^You were gone for (\d+) Seconds.$/, '你离开了 $1 秒。'],
+	[/^(\d+) Royal points$/, '$1 皇家点数'],
+	[/^Cost: (\d+) RP$/, '成本：$1 皇家点数'],
+	[/^Usages: (\d+)\/$/, '用途：$1\/'],
+	[/^workers: (\d+)\/$/, '工人：$1\/'],
+
+]);
 
 //2.采集新词
 //20190320@JAR
@@ -358,6 +368,13 @@ var cnItem = function () {
     for(let reg of cnExcludeWhole){
         if (reg.test(text)){
             return text_prefix + text + text_reg_exclude_postfix + text_postfix;
+        }
+    }
+    
+    //尝试正则替换
+    for (let [key, value] of cnRegReplace.entries()) {
+        if (key.test(text)) {
+            return text_prefix + text.replace(key, value) + text_reg_exclude_postfix + text_postfix;
         }
     }
 
